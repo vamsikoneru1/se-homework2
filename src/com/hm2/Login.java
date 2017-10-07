@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.*;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 
 import com.mysql.jdbc.Driver;
 import com.sun.net.httpserver.Authenticator.Failure;
@@ -100,22 +102,23 @@ public class Login {
 		else
 		{
 		try {
+			HttpSession hs= Util.getSession();
+			
 			// Setup the DataSource object
 			System.out.println("Inside database");
 			com.mysql.jdbc.jdbc2.optional.MysqlDataSource ds = new com.mysql.jdbc.jdbc2.optional.MysqlDataSource();
 			ds.setServerName(System.getenv("ICSI518_SERVER"));
-			ds.setPortNumber(3306);
-			//ds.setDatabaseName(System.getenv("ICSI518_DB"));
-			ds.setDatabaseName("se_proj");
-			ds.setUser("root");
-			ds.setPassword("prasad");
+			ds.setPortNumber(Integer.parseInt(System.getenv("ICSI518_PORT")));
+			ds.setDatabaseName(System.getenv("ICSI518_DB").toString());
+			ds.setUser(System.getenv("ICSI518_USER").toString());
+			ds.setPassword(System.getenv("ICSI518_PASSWORD").toString());
+			
 			
 			con = ds.getConnection();
 			
-			String sql = "SELECT username,password from reg where username= ?";
+			String sql = "SELECT name,username,password from reg where username= ?";
 			PreparedStatement st = con.prepareStatement(sql);
 			st.setString(1, this.username);
-			//st.setString(1, this.password);
 			 
 			
 			ResultSet rs = st.executeQuery();
@@ -129,18 +132,19 @@ public class Login {
 				if(pass.equals(password)&& un.equals(username))
 				{
 					res="sucess";
-					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("username", username);
+					hs.setAttribute("username", username);
+					
 				}
 				else
 				{
-					res="failure";
+					FacesMessage fm= new FacesMessage("Login error", "ERROR MESSAGE");
+					fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+					FacesContext.getCurrentInstance().addMessage(null	, fm);
+					//res="failure";
 				}
-				//rs.close();
+				
 				
 			}
-//				System.out.println("First Name is: " + rs.getString("first_name"));
-//				this.firstName = rs.getString("first_name");
-			
 			
 		}catch (Exception e) {
 			System.err.println("Exception: " + e.getMessage());
@@ -160,7 +164,7 @@ public class Login {
 
 	//}
 	public String Regi() throws SQLException {
-		//Connection con = DriverManager.getConnection("jdbc:mysql://seproj:3306/se_proj", "root", "prasad");
+		
 		Connection con=null;
 		String s="";
 		if(this.email.contains("@")  && (this.email.contains(".com")||this.email.contains(".edu")))
@@ -168,29 +172,19 @@ public class Login {
 		try {
 			// Setup the DataSource object
 			
+			
 			com.mysql.jdbc.jdbc2.optional.MysqlDataSource ds = new com.mysql.jdbc.jdbc2.optional.MysqlDataSource();
 			ds.setServerName(System.getenv("ICSI518_SERVER"));
-			ds.setPortNumber(3306);
-			//ds.setDatabaseName(System.getenv("ICSI518_DB"));
-			ds.setDatabaseName("se_proj");
-			ds.setUser("root");
-			ds.setPassword("prasad");
+			ds.setPortNumber(Integer.parseInt(System.getenv("ICSI518_PORT")));
+			ds.setDatabaseName(System.getenv("ICSI518_DB").toString());
+			ds.setUser(System.getenv("ICSI518_USER").toString());
+			ds.setPassword(System.getenv("ICSI518_PASSWORD").toString());
 			
 			
-//			ds.setServerName(System.getenv("ICSI518_SERVER"));
-//			ds.setPortNumber(3306);
-//			ds.setDatabaseName("ICSI518_DB");
-			//ds.setUser(System.getenv("ICSI518_USER"));
-			//ds.setPassword(System.getenv("ICSI518_PASSWORD"));
-
-
-			// Get a connection object
 			con = ds.getConnection();
 
-			// Get a prepared SQL statement
-			//String sql = "INSERT INTO Registration "+"VALUES (4251, 'Zara', 'Ali@gmail.com', 'koneru','vamsikrishna')";
+			
 			String sql = "INSERT INTO reg "+"(userid, name, email, password,username) values (?,?,?,?,?)";
-			//Statement st = con.createStatement();
 			PreparedStatement st = con.prepareStatement(sql);
 			st.setInt(1, userid);
 			st.setString(2 ,firstname);
@@ -215,16 +209,22 @@ public class Login {
 			}
 		}
 		
-		//return "regsuc";
 		
-		{
-		return "regsuc?faces-redirect=true";
-		}
+		
+		
+		return "login?faces-redirect=true";
+		
 		
 	}
 		else
 			return "failure2";
 	
 
+	}
+	
+	public String logout() {
+		HttpSession hs=Util.getSession();
+		hs.invalidate();
+		return "login";
 	}
 	}
