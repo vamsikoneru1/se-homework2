@@ -119,6 +119,7 @@ public class Login {
 			String sql = "SELECT name,username,password from reg where username= ?";
 			PreparedStatement st = con.prepareStatement(sql);
 			st.setString(1, this.username);
+			
 			 
 			
 			ResultSet rs = st.executeQuery();
@@ -128,6 +129,7 @@ public class Login {
 			while (rs.next()) {
 				un=rs.getString("username");
 				pass=rs.getString("password");
+				this.firstname=rs.getString("name");
 				
 				if(pass.equals(password)&& un.equals(username))
 				{
@@ -137,10 +139,11 @@ public class Login {
 				}
 				else
 				{
-					FacesMessage fm= new FacesMessage("Login error", "ERROR MESSAGE");
+					FacesMessage fm= new FacesMessage("incorrect username or password", "ERROR MESSAGE");
 					fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-					FacesContext.getCurrentInstance().addMessage(null	, fm);
+					FacesContext.getCurrentInstance().addMessage(null, fm);
 					//res="failure";
+					
 				}
 				
 				
@@ -164,10 +167,10 @@ public class Login {
 
 	//}
 	public String Regi() throws SQLException {
-		
+		String res1="";
 		Connection con=null;
 		String s="";
-		if(this.email.contains("@")  && (this.email.contains(".com")||this.email.contains(".edu")))
+		if(this.email.contains("@") && this.firstname.matches("[A-Z][a-zA-Z]*") && (this.email.contains(".com")||this.email.contains(".edu")))
 		{
 		try {
 			// Setup the DataSource object
@@ -211,13 +214,16 @@ public class Login {
 		
 		
 		
-		
-		return "login?faces-redirect=true";
+		//res1="login";
+		return "regsuc?faces-redirect=true";
 		
 		
 	}
 		else
+		{
+			
 			return "failure2";
+		}
 	
 
 	}

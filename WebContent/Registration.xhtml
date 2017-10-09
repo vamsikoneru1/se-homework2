@@ -31,7 +31,7 @@
 				
 	
 				<h:outputText value="email"></h:outputText>
-				<h:inputText  value="#{login.email}"  styleClass="form-control"></h:inputText>
+				<h:inputText  value="#{login.email}"  requiredMessage="Required " styleClass="form-control"></h:inputText>
 				<br/><br/>
 				
 				
@@ -41,10 +41,12 @@
 				<br/><br/>
 				
 				<h:outputText value="password"></h:outputText>
-				<h:inputSecret value="#{login.password}"  styleClass="form-control" required="true"></h:inputSecret>
+				<h:inputSecret value="#{login.password}"  styleClass="form-control" required="true"  ></h:inputSecret>
 				<br/><br/>
 				
 				<h:commandButton value="Register" styleClass="form-control" action="#{login.Regi}" class="btn btn-primary" ></h:commandButton>
+				
+				
 
 			
 		</h:form>
